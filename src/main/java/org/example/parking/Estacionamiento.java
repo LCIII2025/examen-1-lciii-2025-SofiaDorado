@@ -8,21 +8,47 @@ public class Estacionamiento {
     private final Map<String, Cliente> clientesRegistrados = new HashMap<>();
 
     public boolean ingresarVehiculo(String dni, String nombre, Vehiculo vehiculo) {
-        // TODO implementar la logica para registrar el ingreso de un nuevo vehiculo en el parking
+        // TO DO implementar la logica para registrar el ingreso de un nuevo vehiculo en el parking
         // la capacidad maxima del estacionamiento es de 50 vehiculos, si supera esta cap[acidad retornar FALSE
         // validar que no exista otro vehiculo con la misma patente, es un caso de error, retornar FALSE
         // validar si existe el cliente registrado, agregar el nuevo vehiculo en la lista del cliente existente, caso contrario crear un nuevo registro
         // si el proceso es exitoso retornar TRUE
+            if (vehiculosEstacionados.size() >= capacidadMaxima) {
+                 return false;
+            }
+            if(!vehiculosEstacionados.containsKey(vehiculo.getPatente())){
+                Cliente cliente = clientesRegistrados.get(dni);
+                if (cliente == null) {
+                    cliente = new Cliente(dni, nombre);
+                    clientesRegistrados.put(dni, cliente);
+                }
+                cliente.agregarVehiculo(vehiculo);
+                Ticket ticket = new Ticket(cliente, vehiculo);
+                vehiculosEstacionados.put(vehiculo.getPatente(), ticket);
+                return true;
+                }
+            else{
+                return false;
+            }
 
-        return false;
+
     }
 
     public Ticket retirarVehiculo(String patente) throws Exception {
-        // TODO implementar la lógica para retirar un vehiculo del parking
+        // TO DO implementar la lógica para retirar un vehiculo del parking
         // validar que exista la patente, caso contrario arrojar la exception "Vehiculo no encontrado"
         // calcular y retornar el ticket del vehiculoEstacionado (ver Ticket.marcarSalida())
+        Ticket ticket = vehiculosEstacionados.get(patente);
+        if(ticket!=null){
+            ticket.marcarSalida();
+            ticket.calcularPrecio();
+            vehiculosEstacionados.remove(patente);
+            return ticket;
+        } else{
+            throw new Exception("vehiculo no encontrado");
 
-        return null;
+        }
+
     }
 
     public List<Ticket> listarVehiculosEstacionados() {
